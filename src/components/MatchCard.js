@@ -33,12 +33,22 @@ function MatchCard({ match }) {
     });
   };
 
+  const getMatchStatus = () => {
+    if (matchStats?.status?.type === 'finished') {
+      return 'TERMINÉ';
+    } else if (matchStats?.status?.type === 'inprogress') {
+      return 'EN COURS';
+    } else {
+      return 'À VENIR';
+    }
+  };
+
   return (
     <div className="match-card">
       <div className="match-header">
         <h3>{match.tournament.name}</h3>
-        <div className="match-status">
-          {matchStats?.status?.type === 'finished' ? 'TERMINÉ' : 'À VENIR'}
+        <div className={`match-status ${matchStats?.status?.type}`}>
+          {getMatchStatus()}
         </div>
       </div>
       
@@ -48,12 +58,23 @@ function MatchCard({ match }) {
           {matchStats?.status?.type === 'finished' && (
             <div className="team-score">{matchStats.homeScore}</div>
           )}
+          {matchStats?.status?.type === 'inprogress' && (
+            <div className="team-score">{matchStats.homeScore || '0'}</div>
+          )}
         </div>
-        <div className="vs">VS</div>
+        <div className="vs">
+          <div className="vs-circle">VS</div>
+          {matchStats?.status?.type === 'inprogress' && (
+            <div className="match-time">{matchStats.time}'</div>
+          )}
+        </div>
         <div className="team away-team">
           <div className="team-name">{match.awayTeam.name}</div>
           {matchStats?.status?.type === 'finished' && (
             <div className="team-score">{matchStats.awayScore}</div>
+          )}
+          {matchStats?.status?.type === 'inprogress' && (
+            <div className="team-score">{matchStats.awayScore || '0'}</div>
           )}
         </div>
       </div>
@@ -61,6 +82,9 @@ function MatchCard({ match }) {
       <div className="match-info">
         <p>📅 {formatDate(match.startTimestamp)}</p>
         <p>🏟️ {match.venue?.name || 'Stade non spécifié'}</p>
+        {matchStats?.status?.type === 'inprogress' && (
+          <p>⚽ Match en cours</p>
+        )}
       </div>
 
       {matchStats?.manOfTheMatch ? (
